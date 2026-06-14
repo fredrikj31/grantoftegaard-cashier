@@ -1,0 +1,10 @@
+import { Button } from "@shadcn-ui/components/ui/button";
+
+export const HomeRoute = () => {
+  return (
+    <>
+      <h1 className="text-xl">Hello World</h1>
+      <Button onClick={() => console.log("Hello World")}>Click Me</Button>
+    </>
+  );
+};
