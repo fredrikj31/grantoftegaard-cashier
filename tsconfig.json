@@ -26,5 +26,5 @@
       "@shadcn-ui/*": ["./src/shadcn-ui/*"]
     }
   },
-  "include": ["vite.config.ts", "eslint.config.mts", "src"]
+  "include": ["vite.config.ts", "eslint.config.js", "src"]
 }
