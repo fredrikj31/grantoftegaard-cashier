@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json.schemastore.org/web-manifest-combined.json",
+  "name": "Grantoftegaard App",
+  "short_name": "Grantoftegaard",
+  "description": "En simple app, der hjælper med at beregne pris for grøntsager.",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone"
+}
