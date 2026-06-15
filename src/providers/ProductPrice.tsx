@@ -7,6 +7,7 @@ import {
   putProducts,
   deleteProduct as dbDeleteProduct,
   getProductCount,
+  clearAllProducts,
 } from "../services/productDatabase";
 
 export interface ProductPrice {
@@ -25,6 +26,7 @@ interface ProductPriceContextType {
   addProduct: (name: string, price: number, emoji: string) => Promise<boolean>;
   deleteProduct: (id: string) => void;
   reorderProduct: (id: string, newIndex: number) => void;
+  resetProducts: () => Promise<void>;
 }
 
 const ProductPriceContext = createContext<ProductPriceContextType | undefined>(
@@ -113,6 +115,13 @@ export function ProductPriceProvider({
     dbDeleteProduct(id);
   };
 
+  const resetProducts = async () => {
+    await clearAllProducts();
+    const seed = defaultProducts.map((p) => ({ ...p }));
+    await putProducts(seed);
+    setProductPrices(seed);
+  };
+
   const reorderProduct = (id: string, newIndex: number) => {
     setProductPrices((prev) => {
       const product = prev.find((p) => p.id === id);
@@ -154,6 +163,7 @@ export function ProductPriceProvider({
         addProduct,
         deleteProduct,
         reorderProduct,
+        resetProducts,
       }}
     >
       {children}
