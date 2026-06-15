@@ -103,7 +103,13 @@ export function ProductPriceProvider({
   };
 
   const deleteProduct = (id: string) => {
-    setProductPrices((prev) => prev.filter((p) => p.id !== id));
+    setProductPrices((prev) => {
+      const remaining = prev.filter((p) => p.id !== id);
+      const sorted = [...remaining].sort((a, b) => a.index - b.index);
+      const renumbered = sorted.map((p, i) => ({ ...p, index: i }));
+      putProducts(renumbered);
+      return renumbered;
+    });
     dbDeleteProduct(id);
   };
 

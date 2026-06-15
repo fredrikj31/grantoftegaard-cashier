@@ -62,8 +62,9 @@ export const SettingsRoute = () => {
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
-    const newIndex = sortedProducts.findIndex((p) => p.id === String(over.id));
-    reorderProduct(String(active.id), newIndex);
+    const overProduct = sortedProducts.find((p) => p.id === String(over.id));
+    if (!overProduct) return;
+    reorderProduct(String(active.id), overProduct.index);
   };
 
   const sortedProducts = [...products].sort((a, b) => a.index - b.index);
