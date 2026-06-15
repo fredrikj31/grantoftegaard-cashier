@@ -57,7 +57,7 @@ export function AddItemModal({ isOpen, onClose }: AddItemModalProps) {
     <div className="fixed inset-0 bg-black/50 flex items-end md:items-center justify-center z-50 p-4">
       <div className="bg-card rounded-lg shadow-lg w-full max-w-md p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold">Add New Item</h2>
+          <h2 className="text-xl font-bold">Tilføj Produkt</h2>
           <button
             onClick={onClose}
             className="text-muted-foreground hover:text-foreground"
@@ -69,14 +69,12 @@ export function AddItemModal({ isOpen, onClose }: AddItemModalProps) {
         <div className="space-y-4">
           {/* Item Name */}
           <div>
-            <label className="block text-sm font-semibold mb-2">
-              Item Name
-            </label>
+            <label className="block text-sm font-semibold mb-2">Navn</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g., Carrot"
+              placeholder="Kartoffel"
               className="w-full rounded border border-border bg-background px-3 py-2 text-sm"
             />
           </div>
@@ -84,13 +82,13 @@ export function AddItemModal({ isOpen, onClose }: AddItemModalProps) {
           {/* Price */}
           <div>
             <label className="block text-sm font-semibold mb-2">
-              Price (kr)
+              Pris (kr)
             </label>
             <input
               type="number"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              placeholder="e.g., 10"
+              placeholder="10"
               className="w-full rounded border border-border bg-background px-3 py-2 text-sm"
               step="1"
               min="1"
@@ -100,14 +98,17 @@ export function AddItemModal({ isOpen, onClose }: AddItemModalProps) {
           {/* Emoji Picker */}
           <div>
             <label className="block text-sm font-semibold mb-2">Emoji</label>
-            <div className="bg-background rounded border border-border p-2 max-h-80 overflow-y-auto">
-              <EmojiPicker
-                onEmojiClick={(emojiData) => setEmoji(emojiData.emoji)}
-                theme={Theme.DARK}
-                width="100%"
-                height={300}
-              />
-            </div>
+            <EmojiPicker
+              onEmojiClick={(emojiData) => setEmoji(emojiData.emoji)}
+              theme={Theme.LIGHT}
+              width="100%"
+              height={250}
+              skinTonesDisabled
+              searchDisabled
+              previewConfig={{
+                showPreview: false,
+              }}
+            />
           </div>
 
           {/* Error Message */}
@@ -129,10 +130,10 @@ export function AddItemModal({ isOpen, onClose }: AddItemModalProps) {
           {/* Actions */}
           <div className="flex gap-2 pt-2">
             <Button variant="outline" onClick={onClose} className="flex-1">
-              Cancel
+              Annuller
             </Button>
             <Button onClick={handleAddItem} className="flex-1">
-              Add Item
+              Tilføj
             </Button>
           </div>
         </div>
