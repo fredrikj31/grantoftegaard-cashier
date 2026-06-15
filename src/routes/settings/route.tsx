@@ -126,7 +126,7 @@ export const SettingsRoute = () => {
               </div>
 
               {editingId === product.id ? (
-                <div className="flex items-center gap-1 ml-auto flex-shrink-0">
+                <div className="flex items-center gap-1 ml-auto shrink-0">
                   <input
                     type="number"
                     value={editingPrice}
@@ -155,7 +155,7 @@ export const SettingsRoute = () => {
                   </Button>
                 </div>
               ) : (
-                <div className="flex items-center gap-1 ml-auto flex-shrink-0">
+                <div className="flex items-center gap-1 ml-auto shrink-0">
                   <p className="font-bold text-lg w-12 text-right">
                     {product.price}
                   </p>
