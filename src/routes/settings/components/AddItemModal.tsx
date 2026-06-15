@@ -16,7 +16,7 @@ export function AddItemModal({ isOpen, onClose }: AddItemModalProps) {
   const [error, setError] = useState("");
   const { addProduct } = useProductPrices();
 
-  const handleAddItem = () => {
+  const handleAddItem = async () => {
     // Clear previous error
     setError("");
 
@@ -38,7 +38,7 @@ export function AddItemModal({ isOpen, onClose }: AddItemModalProps) {
     }
 
     // Try to add the product
-    const success = addProduct(name, priceNum, emoji);
+    const success = await addProduct(name, priceNum, emoji);
     if (!success) {
       setError("Item with this name already exists");
       return;

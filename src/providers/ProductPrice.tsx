@@ -1,6 +1,13 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { products } from "../data/products";
+import { products as defaultProducts } from "../data/products";
+import {
+  getAllProducts,
+  putProduct,
+  putProducts,
+  deleteProduct as dbDeleteProduct,
+  getProductCount,
+} from "../services/productDatabase";
 
 export interface ProductPrice {
   id: string;
@@ -12,9 +19,10 @@ export interface ProductPrice {
 
 interface ProductPriceContextType {
   products: ProductPrice[];
+  isLoading: boolean;
   updatePrice: (id: string, price: number) => void;
   getPrice: (id: string) => number;
-  addProduct: (name: string, price: number, emoji: string) => boolean;
+  addProduct: (name: string, price: number, emoji: string) => Promise<boolean>;
   deleteProduct: (id: string) => void;
   reorderProduct: (id: string, newIndex: number) => void;
 }
@@ -29,23 +37,33 @@ export function ProductPriceProvider({
   children: React.ReactNode;
 }) {
   const [productPrices, setProductPrices] = useState<ProductPrice[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setProductPrices(
-      products.map((p) => ({
-        id: p.id,
-        name: p.name,
-        emoji: p.emoji,
-        price: p.price,
-        index: p.index,
-      })),
-    );
+    async function init() {
+      const count = await getProductCount();
+      if (count === 0) {
+        const seed = defaultProducts.map((p) => ({ ...p }));
+        await putProducts(seed);
+        setProductPrices(seed);
+      } else {
+        const stored = await getAllProducts();
+        setProductPrices(stored);
+      }
+      setIsLoading(false);
+    }
+    init();
   }, []);
 
   const updatePrice = (id: string, price: number) => {
-    setProductPrices((prevPrices) =>
-      prevPrices.map((p) => (p.id === id ? { ...p, price } : p)),
-    );
+    setProductPrices((prevPrices) => {
+      const updated = prevPrices.map((p) =>
+        p.id === id ? { ...p, price } : p,
+      );
+      const changed = updated.find((p) => p.id === id);
+      if (changed) putProduct(changed);
+      return updated;
+    });
   };
 
   const getPrice = (id: string) => {
@@ -53,15 +71,17 @@ export function ProductPriceProvider({
     return product?.price || 0;
   };
 
-  const addProduct = (name: string, price: number, emoji: string): boolean => {
-    // Check for duplicate name
+  const addProduct = async (
+    name: string,
+    price: number,
+    emoji: string,
+  ): Promise<boolean> => {
     if (
       productPrices.some((p) => p.name.toLowerCase() === name.toLowerCase())
     ) {
       return false;
     }
 
-    // Check for positive price
     if (price <= 0) {
       return false;
     }
@@ -77,12 +97,14 @@ export function ProductPriceProvider({
       index: newIndex,
     };
 
+    await putProduct(newProduct);
     setProductPrices((prev) => [...prev, newProduct]);
     return true;
   };
 
   const deleteProduct = (id: string) => {
     setProductPrices((prev) => prev.filter((p) => p.id !== id));
+    dbDeleteProduct(id);
   };
 
   const reorderProduct = (id: string, newIndex: number) => {
@@ -95,7 +117,6 @@ export function ProductPriceProvider({
         if (p.id === id) {
           return { ...p, index: newIndex };
         }
-        // Shift other items
         if (oldIndex < newIndex && p.index > oldIndex && p.index <= newIndex) {
           return { ...p, index: p.index - 1 };
         }
@@ -104,14 +125,24 @@ export function ProductPriceProvider({
         }
         return p;
       });
+
+      const changed = updated.filter((u) => {
+        const original = prev.find((p) => p.id === u.id);
+        return original && original.index !== u.index;
+      });
+      if (changed.length > 0) putProducts(changed);
+
       return updated;
     });
   };
+
+  if (isLoading) return null;
 
   return (
     <ProductPriceContext.Provider
       value={{
         products: productPrices,
+        isLoading,
         updatePrice,
         getPrice,
         addProduct,
