@@ -1,9 +1,19 @@
-import { ArrowLeft, Plus } from "lucide-react";
+import { ArrowLeft, Plus, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { useProductPrices } from "../../providers/ProductPrice";
 import { Link } from "react-router";
 import { Button } from "@shadcn-ui/components/ui/button";
 import { AddItemModal } from "./components/AddItemModal";
+import {
+  DialogRoot,
+  DialogPortal,
+  DialogBackdrop,
+  DialogViewport,
+  DialogPopup,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+} from "@shadcn-ui/components/ui/dialog";
 import {
   DndContext,
   PointerSensor,
@@ -22,11 +32,12 @@ import {
 import { SortableProductRow } from "./components/SortableProductRow";
 
 export const SettingsRoute = () => {
-  const { products, updatePrice, deleteProduct, reorderProduct } =
+  const { products, updatePrice, deleteProduct, reorderProduct, resetProducts } =
     useProductPrices();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingPrice, setEditingPrice] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -113,6 +124,19 @@ export const SettingsRoute = () => {
               </div>
             </SortableContext>
           </DndContext>
+          <div className="mt-10 border-t border-border pt-8">
+            <h2 className="text-lg font-semibold mb-1">Nulstil data</h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              Gendanner den originale produktliste og sletter alle ændringer.
+            </p>
+            <Button
+              variant="destructive"
+              onClick={() => setIsResetDialogOpen(true)}
+            >
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Nulstil data
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -127,6 +151,36 @@ export const SettingsRoute = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />
+
+      <DialogRoot open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
+        <DialogPortal>
+          <DialogBackdrop />
+          <DialogViewport>
+            <DialogPopup>
+              <DialogTitle className="text-lg font-semibold mb-2">
+                Nulstil data?
+              </DialogTitle>
+              <DialogDescription className="text-sm text-muted-foreground mb-6">
+                Dette vil slette alle ændringer og gendanne den originale produktliste. Handlingen kan ikke fortrydes.
+              </DialogDescription>
+              <div className="flex gap-3 justify-end">
+                <DialogClose
+                  render={<Button variant="outline">Annuller</Button>}
+                />
+                <Button
+                  variant="destructive"
+                  onClick={async () => {
+                    await resetProducts();
+                    setIsResetDialogOpen(false);
+                  }}
+                >
+                  Nulstil
+                </Button>
+              </div>
+            </DialogPopup>
+          </DialogViewport>
+        </DialogPortal>
+      </DialogRoot>
     </main>
   );
 };

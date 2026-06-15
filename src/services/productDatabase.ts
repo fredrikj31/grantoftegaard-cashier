@@ -52,3 +52,8 @@ export async function getProductCount(): Promise<number> {
   const db = await getDB();
   return db.count(STORE_NAME);
 }
+
+export async function clearAllProducts(): Promise<void> {
+  const db = await getDB();
+  await db.clear(STORE_NAME);
+}
